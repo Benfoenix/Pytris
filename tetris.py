@@ -11,19 +11,19 @@ lost = 0
 lines_removed2 = 0
 
 SHAPES = [
-    ([[1, 1, 1, 1]], None),  # I
+    ([[1, 1, 1, 1]], (255, 0, 0)),    # I
     ([[1, 1, 1],
-      [1, 0, 0]], None),  # S
+      [1, 0, 0]], (0, 255, 0)),      # S
     ([[1, 1, 1],
-      [0, 0, 1]], None),  # J
+      [0, 0, 1]], (0, 0, 255)),      # J
     ([[1, 1, 1],
-      [0, 1, 0]], None),  # L
+      [0, 1, 0]], (255, 255, 0)),    # L
     ([[1, 1],
-      [1, 1]], None),  # O
+      [1, 1]], (128, 0, 128)),       # O
     ([[1, 1, 0],
-      [0, 1, 1]], None),  # Z
+      [0, 1, 1]], (255, 165, 0)),    # Z
     ([[0, 1, 1],
-      [1, 1, 0]], None),  # T
+      [1, 1, 0]], (255, 255, 255))   # T
 ]
 
 # Function to initialize the game
@@ -36,8 +36,7 @@ def initialize_game():
 
 # Function to create a new tetromino with a random color
 def new_tetromino():
-    shape, _ = random.choice(SHAPES)
-    color = (random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
+    shape, color = random.choice(SHAPES)
     return shape, color, [WIDTH // 2 - len(shape[0]) // 2, 0]
 
 # Function to draw a tetromino on the screen
@@ -49,12 +48,12 @@ def draw_tetromino(screen, tetromino, position, color):
                                                  i * GRID_SIZE + position[1] * GRID_SIZE, GRID_SIZE, GRID_SIZE))
 
 # Function to merge the current tetromino into the grid
-def merge_tetromino(grid, tetromino, position, color):
+def merge_tetromino(grid, tetromino, position):
     for i, row in enumerate(tetromino):
         for j, cell in enumerate(row):
             if cell:
                 x, y = j + position[0], i + position[1]
-                grid[y][x] = color
+                grid[y][x] = 1
 
 # Function to check for collisions
 def collision(grid, tetromino, position):
@@ -64,7 +63,7 @@ def collision(grid, tetromino, position):
                 x, y = j + position[0], i + position[1]
                 if x < 0 or x >= WIDTH or y >= HEIGHT:
                     return True
-                if y >= 0 and grid[y][x] != 0:  # Check if the cell is occupied
+                if y >= 0 and grid[y][x] == 1:
                     return True
     return False
 
@@ -119,6 +118,10 @@ def main(lost=lost,lines_removed2=lines_removed2):
                             rotated_tetromino = list(zip(*reversed(current_tetromino)))
                             if not collision(grid, rotated_tetromino, tetromino_position):
                                 current_tetromino = rotated_tetromino
+
+                        elif event.key == pygame.K_BACKSPACE:
+                            # Stop the game
+                            exit()
                         
 
                 current_time = pygame.time.get_ticks()
@@ -127,7 +130,7 @@ def main(lost=lost,lines_removed2=lines_removed2):
                     if not collision(grid, current_tetromino, new_position):
                         tetromino_position = new_position
                     else:
-                        merge_tetromino(grid, current_tetromino, tetromino_position, tetromino_color)
+                        merge_tetromino(grid, current_tetromino, tetromino_position)
                         lines_removed = remove_lines(grid)
                         lines_removed2 += lines_removed
                         print("lvl ", lines_removed2)
@@ -146,7 +149,7 @@ def main(lost=lost,lines_removed2=lines_removed2):
                 for i, row in enumerate(grid):
                     for j, cell in enumerate(row):
                         if cell:
-                            pygame.draw.rect(screen, cell, (j * GRID_SIZE, i * GRID_SIZE, GRID_SIZE, GRID_SIZE))
+                            pygame.draw.rect(screen, tetromino_color, (j * GRID_SIZE, i * GRID_SIZE, GRID_SIZE, GRID_SIZE))
 
                 pygame.display.flip()
                 clock.tick(30)  # Adjust the frames per second (FPS) as needed
