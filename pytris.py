@@ -33,14 +33,12 @@ def initialize_game():
     pygame.display.set_caption("Pytris")
     clock = pygame.time.Clock()
     
-    # Generate random colors for each tetromino shape
-    tetromino_colors = [(random.randint(50, 255), random.randint(50, 255), random.randint(50, 255)) for _ in range(len(SHAPES))]
-    
-    return screen, clock, tetromino_colors
+    return screen, clock
 
 # Function to create a new tetromino with a random color
-def new_tetromino(tetromino_colors):
-    shape, color = random.choice(list(zip(SHAPES, tetromino_colors)))
+def new_tetromino():
+    shape = random.choice(SHAPES)
+    color = (random.randint(50, 255), random.randint(50, 255), random.randint(50, 255))
     return shape, color, [WIDTH // 2 - len(shape[0]) // 2, 0]
 
 # Function to draw a tetromino on the screen
@@ -86,7 +84,7 @@ def remove_lines(grid, lines_removed2, fall_speed):
 
 # Main function
 def main(lost=lost, lines_removed2=lines_removed2):
-    screen, clock, tetromino_colors = initialize_game()
+    screen, clock = initialize_game()
     grid = [[(0, BLACK)] * WIDTH for _ in range(HEIGHT)]  # Initialize with tuples (0, BLACK)
     fall_time = 0
     fall_speed = 500  # in milliseconds
@@ -95,7 +93,7 @@ def main(lost=lost, lines_removed2=lines_removed2):
     while True:
         if lost == 0:
             random.seed(round_seed)
-            current_tetromino, tetromino_color, tetromino_position = new_tetromino(tetromino_colors)
+            current_tetromino, tetromino_color, tetromino_position = new_tetromino()
             fall_time = 0
             old_fall_time = 0
             round_seed += 1
