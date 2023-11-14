@@ -1,2 +1,2 @@
 # Pytris
-Special Python Tetris
+[help](https://www.buymeacoffee.com/pytris)
