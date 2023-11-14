@@ -75,88 +75,72 @@ def remove_lines(grid):
         grid.insert(0, [0] * WIDTH)
     return len(lines_to_remove)
 
-# Main function
-def main(lost=lost,lines_removed2=lines_removed2):
-    screen, clock = initialize_game()
-    grid = [[0] * WIDTH for _ in range(HEIGHT)]
-    fall_time = 0
-    fall_speed = 500  # in milliseconds
-    round_seed = random.randint(0,9999)
-
-    while True:
-        if lost == 0:
-            random.seed(round_seed)
-            current_tetromino, tetromino_color, tetromino_position = new_tetromino()
-            fall_time = 0
-            old_fall_time = 0
-            round_seed += 1
-            lost = 0
-            while True:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        sys.exit()
-
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                            new_position = [tetromino_position[0] - 1, tetromino_position[1]]
-                            if not collision(grid, current_tetromino, new_position):
-                                tetromino_position = new_position
-
-                        elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                            new_position = [tetromino_position[0] + 1, tetromino_position[1]]
-                            if not collision(grid, current_tetromino, new_position):
-                                tetromino_position = new_position
-
-                        elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                            new_position = [tetromino_position[0], tetromino_position[1] + 1]
-                            if not collision(grid, current_tetromino, new_position):
-                                tetromino_position = new_position
-
-                        elif event.key == pygame.K_UP or event.key == pygame.K_w:
-                            # Rotate the tetromino
-                            rotated_tetromino = list(zip(*reversed(current_tetromino)))
-                            if not collision(grid, rotated_tetromino, tetromino_position):
-                                current_tetromino = rotated_tetromino
-
-                        elif event.key == pygame.K_BACKSPACE:
-                            # Stop the game
-                            exit()
-                        
-
-                current_time = pygame.time.get_ticks()
-                if current_time - fall_time > fall_speed:
-                    new_position = [tetromino_position[0], tetromino_position[1] + 1]
-                    if not collision(grid, current_tetromino, new_position):
-                        tetromino_position = new_position
-                    else:
-                        merge_tetromino(grid, current_tetromino, tetromino_position)
-                        lines_removed = remove_lines(grid)
-                        lines_removed2 += lines_removed
-                        print("lvl ", lines_removed2)
-                        fall_speed -= (lines_removed2 * 25-(lines_removed2 * 3))
-                        break
-                    old_fall_time = fall_time
-                
-
-                    fall_time = current_time
-                if fall_time == 1:
-                    lost = 0
-
-                screen.fill(BLACK)
-                draw_tetromino(screen, current_tetromino, tetromino_position, tetromino_color)
-
-                for i, row in enumerate(grid):
-                    for j, cell in enumerate(row):
-                        if cell:
-                            pygame.draw.rect(screen, tetromino_color, (j * GRID_SIZE, i * GRID_SIZE, GRID_SIZE, GRID_SIZE))
-
-                pygame.display.flip()
-                clock.tick(30)  # Adjust the frames per second (FPS) as needed
-            if old_fall_time == 0:
-                lost = 1
-        else:
-            os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
-
-if __name__ == "__main__":
-    main()
+screen, clock = initialize_game()
+grid = [[0] * WIDTH for _ in range(HEIGHT)]
+fall_time = 0
+fall_speed = 500  # in milliseconds
+round_seed = random.randint(0,9999)
+while True:
+    if lost == 0:
+        random.seed(round_seed)
+        current_tetromino, tetromino_color, tetromino_position = new_tetromino()
+        fall_time = 0
+        old_fall_time = 0
+        round_seed += 1
+        lost = 0
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                        new_position = [tetromino_position[0] - 1, tetromino_position[1]]
+                        if not collision(grid, current_tetromino, new_position):
+                            tetromino_position = new_position
+                    elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                        new_position = [tetromino_position[0] + 1, tetromino_position[1]]
+                        if not collision(grid, current_tetromino, new_position):
+                            tetromino_position = new_position
+                    elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                        new_position = [tetromino_position[0], tetromino_position[1] + 1]
+                        if not collision(grid, current_tetromino, new_position):
+                            tetromino_position = new_position
+                    elif event.key == pygame.K_UP or event.key == pygame.K_w:
+                        # Rotate the tetromino
+                        rotated_tetromino = list(zip(*reversed(current_tetromino)))
+                        if not collision(grid, rotated_tetromino, tetromino_position):
+                            current_tetromino = rotated_tetromino
+                    elif event.key == pygame.K_BACKSPACE:
+                        # Stop the game
+                        exit()
+            current_time = pygame.time.get_ticks()
+            if current_time - fall_time > fall_speed:
+                new_position = [tetromino_position[0], tetromino_position[1] + 1]
+                if not collision(grid, current_tetromino, new_position):
+                    tetromino_position = new_position
+                else:
+                    merge_tetromino(grid, current_tetromino, tetromino_position)
+                    lines_removed = remove_lines(grid)
+                    lines_removed2 += lines_removed
+                    print("lvl ", lines_removed2+1)
+                    fall_speed -= (lines_removed2 * 5)
+                    lines_removed = 0
+                    break
+                old_fall_time = fall_time
+                fall_time = current_time
+            if fall_time == 1:
+                lost = 0
+            screen.fill(BLACK)
+            draw_tetromino(screen, current_tetromino, tetromino_position, tetromino_color)
+            # Draw already dropped tetrominos
+            for i, row in enumerate(grid):
+                for j, cell in enumerate(row):
+                    if cell:
+                        pygame.draw.rect(screen, WHITE, (j * GRID_SIZE, i * GRID_SIZE, GRID_SIZE, GRID_SIZE))
+            pygame.display.flip()
+            clock.tick(30)  # Adjust the frames per second (FPS) as needed
+        if old_fall_time == 0:
+            lost = 1
+    else:
+        os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
