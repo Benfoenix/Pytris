@@ -1,9 +1,17 @@
+# Tested in Pydroid with BlueStacks5
+
 import pygame
 import random
 import sys, os
 
+pygame.init()
+screen_info = pygame.display.Info()
+
 # Constants
-WIDTH, HEIGHT = 10, 20
+if screen_info.current_w < screen_info.current_h:
+	WIDTH, HEIGHT = round(screen_info.current_w / 60), round(screen_info.current_h / 30)
+else:
+	WIDTH, HEIGHT = round(screen_info.current_h / 60), round(screen_info.current_h / 30)
 GRID_SIZE = 30
 WHITE, BLACK = (255, 255, 255), (0, 0, 0)
 score = 0
@@ -29,11 +37,11 @@ SHAPES = [
 # Function to initialize the game
 def initialize_game():
     pygame.init()
+    screen_info = pygame.display.Info()
     screen = pygame.display.set_mode((WIDTH * GRID_SIZE, HEIGHT * GRID_SIZE))
     pygame.display.set_caption("Pytris")
     clock = pygame.time.Clock()
     font = pygame.font.Font(None, 36)  # Font for displaying text
-
     return screen, clock, font
 
 # Function to create a new tetromino with a random color
@@ -120,6 +128,10 @@ def main(lost=lost, lines_removed2=lines_removed2):
                         pygame.quit()
                         sys.exit()
 
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                             new_position = [tetromino_position[0] - 1, tetromino_position[1]]
@@ -141,8 +153,6 @@ def main(lost=lost, lines_removed2=lines_removed2):
                         elif event.key == pygame.K_BACKSPACE:
                             # Stop the game
                             exit()
-                        elif event.key == pygame.K_v:
-                            pygame.display.toggle_fullscreen()
                         elif event.key == pygame.K_RETURN:
                             lines_removed2 = 0
                             lost = 0

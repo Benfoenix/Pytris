@@ -32,7 +32,7 @@ def initialize_game():
     screen = pygame.display.set_mode((WIDTH * GRID_SIZE, HEIGHT * GRID_SIZE))
     pygame.display.set_caption("Pytris")
     clock = pygame.time.Clock()
-    font = pygame.font.Font(None, 36)  # Font for displaying text
+    font = pygame.font.Font("Pixel.ttf", 24)  # Font for displaying text
 
     return screen, clock, font
 
@@ -85,11 +85,17 @@ def remove_lines(grid, lines_removed2, fall_speed):
 
 # Function to determine the color based on the level
 def get_level_color(level):
-    # todo: actually make this generate a color
-    r = 255
-    g = 0
-    b = 255
-    return(r,g,b)
+    if 0 < level <= 5:
+        green = 50 + level * 30
+        return (0, green, 0)
+    elif 5 < level <= 10:
+        red = 255 - (level - 5) * 30
+        return (red, 0, 0)
+    elif 10 < level <= 25:
+        red = 255 - (level - 10) * 10
+        return (red, 0, 0)
+    else:
+        return (255, 0, 0)
 
 # Function to display text on the screen
 def display_text(screen, font, text, color, position):
